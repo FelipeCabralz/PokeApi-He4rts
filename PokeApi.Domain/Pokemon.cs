@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace PokeApi.Domain
 {
-    public class Pokemons
+    public class Pokemon
     {
-        public int Id { get; set; }
+        public int PokemonId { get; set; }
         public string Nome { get; set; }
         public string Imagem_Url { get; set; }
         public string Atributos { get; set; }

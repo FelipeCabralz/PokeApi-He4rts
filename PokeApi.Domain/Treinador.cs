@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PokeApi.Domain
 {
-    public class Treinadores
+    public class Treinador
     {
         public int Id { get; set; }
         public string Nome { get; set; }

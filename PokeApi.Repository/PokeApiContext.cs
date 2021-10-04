@@ -13,7 +13,12 @@ namespace PokeApi.Repository
     {
         public PokeApiContext(DbContextOptions<PokeApiContext> options) : base(options) { }
 
-        public DbSet<Treinadores> Treinadores { get; set; }
-        public DbSet<Pokemons> Pokemons { get; set; }
+        public DbSet<Treinador> Treinadores { get; set; }
+        public DbSet<Pokemon> Pokemons { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<TreinadorPokemon>().HasKey(sc => new { sc.Treinador.Id, sc.Pokemon.PokemonId });
+        }
     }
 }
