@@ -14,5 +14,6 @@ namespace PokeApi.Repository
         public PokeApiContext(DbContextOptions<PokeApiContext> options) : base(options) { }
 
         public DbSet<Treinadores> Treinadores { get; set; }
+        public DbSet<Pokemons> Pokemons { get; set; }
     }
 }
