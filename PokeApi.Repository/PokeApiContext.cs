@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PokeApi.Repository
 {
-    public class PokeApiContext : IdentityDbContext
+    public class PokeApiContext : DbContext
     {
         public PokeApiContext(DbContextOptions<PokeApiContext> options) : base(options) { }
 
@@ -18,7 +18,9 @@ namespace PokeApi.Repository
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<TreinadorPokemon>().HasKey(sc => new { sc.Treinador.Id, sc.Pokemon.PokemonId });
+            base.OnModelCreating(modelBuilder);
+
+            //modelBuilder.Entity<TreinadorPokemon>().HasKey(sc => new { sc.Treinador.Id, sc.Pokemon.Pokemon });
         }
     }
 }

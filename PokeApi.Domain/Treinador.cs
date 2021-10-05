@@ -8,7 +8,7 @@ namespace PokeApi.Domain
 {
     public class Treinador
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string Nome { get; set; }
         public string Regioes { get; set; }
         public int Idade { get; set; }
