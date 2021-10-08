@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PokeApi.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,10 +21,10 @@ namespace PokeApi.Repository
             _context.Set<T>().Add(entity);
         }
 
-        public void Delelete(int id)
+        public void Delete(int id)
         {
-            var q = GetById(id);
-            _context.Set<T>().Remove(q);
+            var pokemon = GetById(id);
+            _context.Set<T>().Remove(pokemon);
         }
 
         public void Edit(T entity)
@@ -41,9 +42,25 @@ namespace PokeApi.Repository
             return _context.Set<T>().Find(id);
         }
 
-        public int Savechange()
+        public async Task<bool> SavechangesAsync()
         {
-            return _context.SaveChanges();
+            return (await _context.SaveChangesAsync()) > 0;
+        }
+
+        //TREINADOR
+
+        public async Task<Treinador[]> GetAllTreinadoresAsync()
+        {
+            IQueryable<Treinador> query = _context.Treinadores;
+
+            return await query.ToArrayAsync();
+        }
+
+        public async Task<Pokemon[]> GetAllPokemonsAsync()
+        {
+            IQueryable<Pokemon> query = _context.Pokemons;
+
+            return await query.ToArrayAsync();
         }
     }
 }
