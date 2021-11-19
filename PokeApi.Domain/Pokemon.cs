@@ -8,7 +8,7 @@ namespace PokeApi.Domain
 {
     public class Pokemon
     {
-        public Guid Id { get; set; }
+        public Guid PokemonId { get; set; }
         public string Nome { get; set; }
         public string Imagem_Url { get; set; }
         public string Atributos { get; set; }

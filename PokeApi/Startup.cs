@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using PokeApi.Domain.Interfaces;
 using PokeApi.Repository;
 using System;
 using System.Collections.Generic;
@@ -27,7 +28,11 @@ namespace PokeApi
         {
             services.AddDbContext<PokeApiContext>(o => 
                 o.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("PokeApi.Repository")));
-            services.AddRazorPages();
+
+            services.AddScoped<ITreinadorRepository, TreinadorRepository>();
+            services.AddScoped<IPokemonRepository, PokemonRepository>();
+
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -40,11 +45,8 @@ namespace PokeApi
             else
             {
                 app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -53,7 +55,7 @@ namespace PokeApi
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapRazorPages();
+                endpoints.MapControllers();
             });
         }
     }

@@ -11,14 +11,14 @@ namespace PokeApi.Repository.Migrations
                 name: "Pokemons",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PokemonId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Nome = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Imagem_Url = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Atributos = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Pokemons", x => x.Id);
+                    table.PrimaryKey("PK_Pokemons", x => x.PokemonId);
                 });
 
             migrationBuilder.CreateTable(
@@ -34,6 +34,18 @@ namespace PokeApi.Repository.Migrations
                 {
                     table.PrimaryKey("PK_Treinadores", x => x.Id);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "TreinadorPokemon",
+                columns: table => new
+                {
+                    TreinadorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PokemonId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TreinadorPokemon", x => new { x.TreinadorId, x.PokemonId });
+                });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -43,6 +55,9 @@ namespace PokeApi.Repository.Migrations
 
             migrationBuilder.DropTable(
                 name: "Treinadores");
+
+            migrationBuilder.DropTable(
+                name: "TreinadorPokemon");
         }
     }
 }

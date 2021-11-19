@@ -16,12 +16,12 @@ namespace PokeApi.Repository.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.10")
+                .HasAnnotation("ProductVersion", "5.0.12")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("PokeApi.Domain.Pokemon", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("PokemonId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -34,7 +34,7 @@ namespace PokeApi.Repository.Migrations
                     b.Property<string>("Nome")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("PokemonId");
 
                     b.ToTable("Pokemons");
                 });
@@ -57,6 +57,19 @@ namespace PokeApi.Repository.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Treinadores");
+                });
+
+            modelBuilder.Entity("PokeApi.Domain.TreinadorPokemon", b =>
+                {
+                    b.Property<Guid>("TreinadorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PokemonId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("TreinadorId", "PokemonId");
+
+                    b.ToTable("TreinadorPokemon");
                 });
 #pragma warning restore 612, 618
         }

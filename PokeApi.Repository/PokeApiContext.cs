@@ -20,7 +20,7 @@ namespace PokeApi.Repository
         {
             base.OnModelCreating(modelBuilder);
 
-            //modelBuilder.Entity<TreinadorPokemon>().HasKey(sc => new { sc.Treinador.Id, sc.Pokemon.Pokemon });
+            modelBuilder.Entity<TreinadorPokemon>().HasKey(sc => new { sc.TreinadorId, sc.PokemonId });
         }
     }
 }
