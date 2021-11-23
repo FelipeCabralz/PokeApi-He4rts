@@ -7,5 +7,6 @@ namespace PokeApi.Domain.Interfaces
     {
         Task<Pokemon[]> GetAllPokemonsAsync();
         Task<Pokemon> GetPokemonsAsyncById(Guid pokemonId);
+        Task<Pokemon> GetPokemonsAsyncByName(Guid pokemonId);
     }
 }

@@ -22,5 +22,12 @@ namespace PokeApi.Repository
                 .OrderBy(c => c.PokemonId)
                 .Where(c => c.PokemonId == pokemonId).AsSplitQuery()
                 .FirstOrDefaultAsync();
+
+        public async Task<Pokemon> GetPokemonsAsyncByName(Guid pokemonId)
+            => await DbSet
+                .AsNoTracking()
+                .OrderBy(c => c.PokemonId)
+                .Where(c => c.PokemonId == pokemonId).AsSplitQuery()
+                .FirstOrDefaultAsync();
     }
 }

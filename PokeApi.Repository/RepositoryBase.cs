@@ -40,7 +40,7 @@ namespace PokeApi.Repository
         public TEntity GetById(object id)
             => DbSet.Find(id);
 
-        public async Task<bool> SavechangesAsync()
+        public async Task<bool> SaveChangesAsync()
             => (await _context.SaveChangesAsync()) > 0;
     }
 }

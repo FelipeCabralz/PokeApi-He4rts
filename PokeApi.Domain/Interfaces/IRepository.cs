@@ -12,6 +12,6 @@ namespace PokeApi.Domain.Interfaces
         void Delete(TEntity entity);
         List<TEntity> GetAll();
         TEntity GetById(object id);
-        Task<bool> SavechangesAsync();
+        Task<bool> SaveChangesAsync();
     }
 }
