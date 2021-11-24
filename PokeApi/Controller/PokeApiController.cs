@@ -1,121 +1,202 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PokeApi.Domain;
-using PokeApi.Domain.Interfaces;
+using PokeApi.Domain.ViewModels;
 using PokeApi.Repository;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace PokeApi.WebAPI.Controller
 {
-    [Route("pokemons")]
+    [Route("v1")]
     [ApiController]
     public class PokeApiController : ControllerBase
     {
-        private readonly IPokemonRepository _repo;
+        //private readonly IPokemonRepository _repo;
 
-        public PokeApiController(IPokemonRepository repo)
+        //public PokeApiController(IPokemonRepository repo)
+        //{
+        //    _repo = repo;
+        //}
+
+        [HttpGet, Route("pokemons")]
+        public async Task<IActionResult> GetAsync(
+            [FromServices] PokeApiContext context)
         {
-            _repo = repo;
+            var pokemons = await context
+                .Pokemons
+                .AsNoTracking()
+                .ToListAsync();
+            return Ok(pokemons);
+
+            //try
+            //{
+            //    var pokemons = await _repo.GetAllPokemonsAsync();
+
+            //    return Ok(pokemons);
+            //}
+            //catch (System.Exception ex)
+            //{
+            //    return this.StatusCode(StatusCodes.Status500InternalServerError, $"Banco de Dados falhou {ex.Message}");
+            //}
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Get()
+        [HttpGet("pokemons/{pokemonId}")]
+        public async Task<IActionResult> GetByIdAsync(
+            [FromServices] PokeApiContext context,
+            [FromRoute] Guid pokemonId)
         {
-            try
-            {
-                var pokemons = await _repo.GetAllPokemonsAsync();
+            var pokemon = await context
+                .Pokemons
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.PokemonId == pokemonId);
 
-                return Ok(pokemons);
-            }
-            catch (System.Exception ex)
-            {
-                return this.StatusCode(StatusCodes.Status500InternalServerError, $"Banco de Dados falhou {ex.Message}");
-            }
+            return pokemon == null
+                ? NotFound()
+                : Ok(pokemon);
+
+            //try
+            //{
+            //    var pokemons = await _repo.GetPokemonsAsyncById(pokemonId);
+            //    if (pokemonId == Guid.Empty) return NotFound();
+
+            //    return Ok(pokemons);
+            //}
+            //catch (System.Exception ex)
+            //{
+            //    return this.StatusCode(StatusCodes.Status500InternalServerError, $"Banco de Dados falhou {ex.Message}");
+            //}
         }
 
-        [HttpGet("{pokemonId}")]
-        public async Task<IActionResult> Get(Guid pokemonId)
+        [HttpPost, Route("pokemon")]
+        public async Task<IActionResult> PostAsync(
+            [FromServices] PokeApiContext context,
+            [FromBody] CreatePokemonViewModel model)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var pokemon = new Pokemon
+            {
+
+                Nome = model.Nome,
+                Imagem_Url = model.Imagem_Url,
+                Atributos = model.Atributos,
+            };
+
             try
             {
-                var pokemons = await _repo.GetPokemonsAsyncById(pokemonId);
-                if (pokemonId == Guid.Empty) return NotFound();
-
-                return Ok(pokemons);
+                await context.Pokemons.AddAsync(pokemon);
+                await context.SaveChangesAsync();
+                return Created($"v1/pokemon/{pokemon.PokemonId}", pokemon);
             }
-            catch (System.Exception ex)
+            catch (Exception e)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError, $"Banco de Dados falhou {ex.Message}");
+                return BadRequest();
             }
+
+            //try 
+            //{
+            //    _repo.Add(pokemon);
+
+            //    if (await _repo.SaveChangesAsync())
+            //    {
+            //        return Ok();
+            //    }
+            //}
+            //catch (System.Exception ex)
+            //{
+            //    return this.StatusCode(StatusCodes.Status500InternalServerError,
+            //        $"Banco de Dados falhou {ex.Message}");
+            //}
+
+            //return BadRequest();
         }
 
-        [HttpPost, Route("criar_pokemon")]
-        public async Task<IActionResult> Post([FromBody] Pokemon pokemon)
+        [HttpPut("pokemons/{id}")]
+        public async Task<IActionResult> PutAsync(
+            [FromServices] PokeApiContext context,
+            [FromBody] CreatePokemonViewModel model,
+            [FromRoute] Guid id)
         {
-            try 
-            {
-                _repo.Add(pokemon);
+            if (!ModelState.IsValid)
+                return BadRequest();
 
-                if (await _repo.SaveChangesAsync())
-                {
-                    return Ok();
-                }
-            }
-            catch (System.Exception ex)
+            var pokemon = await context.Pokemons.FirstOrDefaultAsync(x => x.PokemonId == id);
+
+            if (pokemon == null)
+                return NotFound();
+
+            try
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError,
-                    $"Banco de Dados falhou {ex.Message}");
+                pokemon.Nome = model.Nome;
+                pokemon.Imagem_Url = model.Imagem_Url;
+                pokemon.Atributos = model.Atributos;
+
+                context.Pokemons.Update(pokemon);
+                await context.SaveChangesAsync();
+                return Ok(pokemon);
+            }
+            catch (Exception e)
+            {
+                return BadRequest();
             }
 
-            return BadRequest();
+            //try
+            //{
+            //    if (pokemon == null) return NotFound();
+
+            //    _repo.Edit(pokemon);
+
+            //    if (await _repo.SaveChangesAsync())
+            //    {
+            //        return Ok(pokemon);
+            //    }
+            //}
+            //catch (System.Exception ex)
+            //{
+            //    return this.StatusCode(StatusCodes.Status500InternalServerError, $"Banco de Dados falhou {ex.Message}");
+            //}
+            //return BadRequest();
         }
 
-        [HttpPut("{pokemonId}")]
-        public async Task<IActionResult> Put([FromBody] Pokemon pokemon) 
+        [HttpDelete("pokemons/{id}")]
+        public async Task<IActionResult> DeleteAsync(
+            [FromServices] PokeApiContext context,
+            [FromRoute] Guid id)
         {
+            var pokemon = await context.Pokemons.FirstOrDefaultAsync(x => x.PokemonId == id);
+
             try
             {
-                if (pokemon == null) return NotFound();
+                context.Pokemons.Remove(pokemon);
+                await context.SaveChangesAsync();
 
-                _repo.Edit(pokemon);
-
-                if (await _repo.SaveChangesAsync())
-                {
-                    return Ok();
-                }
+                return Ok();
             }
-            catch (System.Exception ex)
+            catch (Exception e)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError, $"Banco de Dados falhou {ex.Message}");
-            }
-            return BadRequest();
-        } 
-
-        [HttpDelete("{pokemonId}"), Route("{atualizar}")]
-        public async Task<IActionResult> Delete(Guid pokemonId)
-        {
-            try
-            {
-                var pokemon = await _repo.GetPokemonsAsyncByName(pokemonId);
-                if (pokemon == null) return NotFound();// ou também pokemonId == Guid.Empty
-
-                _repo.Delete(pokemon);
-
-                if (await _repo.SaveChangesAsync())
-                {
-                    return Ok();
-                }
-            }
-            catch (System.Exception ex)
-            {
-                return this.StatusCode(StatusCodes.Status500InternalServerError, $"Banco de Dados falhou {ex.Message}");
+                return BadRequest();
             }
 
-            return BadRequest();
+            //try
+            //{
+            //    var pokemon = await _repo.GetPokemonsAsyncByName(pokemonId);
+            //    if (pokemon == null) return NotFound();// ou também pokemonId == Guid.Empty
+
+            //    _repo.Delete(pokemon);
+
+            //    if (await _repo.SaveChangesAsync())
+            //    {
+            //        return Ok();
+            //    }
+            //}
+            //catch (System.Exception ex)
+            //{
+            //    return this.StatusCode(StatusCodes.Status500InternalServerError, $"Banco de Dados falhou {ex.Message}");
+            //}
+
+            //return BadRequest();
         }
 
     }
